@@ -1,0 +1,10 @@
+    version: '3'
+    
+    services:
+        ithappens:
+            build: .
+            ports:
+                    - "8080:80"
+            volumes:
+                    # - ./:/media/luiz/DADOS/projetos/pessoal/ItHappens/storage/logs
+                    - ./:/usr/share/nginx

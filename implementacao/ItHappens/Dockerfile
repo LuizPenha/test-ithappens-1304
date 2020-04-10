@@ -1,0 +1,3 @@
+FROM wyveo/nginx-php-fpm:latest
+RUN chmod -R 777 usr/share/nginx/
+
