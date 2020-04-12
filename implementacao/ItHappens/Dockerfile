@@ -1,3 +1,8 @@
 FROM wyveo/nginx-php-fpm:latest
-RUN chmod -R 777 usr/share/nginx/
+WORKDIR /usr/share/nginx/
+RUN rm -rf /usr/share/nginx/html
+COPY . /usr/share/nginx
+RUN chmod -R 775 /usr/share/nginx/storage/*
+RUN ln -s public html
+# RUN chmod -R 777 usr/share/nginx/
 
