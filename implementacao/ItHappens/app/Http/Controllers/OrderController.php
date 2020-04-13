@@ -17,10 +17,18 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public static function index($api = false)
     {
         $orders = Order::with('branch')->with('client')->with('employee')->get();
-        return view('ith.order_index',compact('orders'));
+
+        if( $api == true ){
+              //write your logic for api call
+              return response()->json($orders);
+        }else{
+             //write your logic for web call
+             return view('ith.order_index',compact('orders'));
+        }
+        
     }
 
     /**
@@ -28,8 +36,27 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public static function create(Request $request)
     {  
+        //return $request;
+        if( $request->is('api/*')){
+            //write your logic for api call
+            return response()->json(['api'=> 'results']);
+        }else{
+            //write your logic for web call
+           // $user = $this->getWebUser();
+        }
+
+        // if (Request::wantsJson()) {
+        //     // return JSON-formatted response
+        // } else {
+        //     // return HTML response
+        // }
+
+
+
+        // if($request['api'])
+        //     return response()->json(['message' => 'it Happens API', 'status' => 'Connected']);
         $type = $request['type'];
         $branch_list = Branch::all();
         return view('ith.order_create', compact('branch_list','type'));
@@ -42,7 +69,8 @@ class OrderController extends Controller
      * @return \Illuminate\Http\Response
      */ 
     public function store(Request $request)
-    {   $data = $request;
+    {   return '<pre>'.$request.'</pre>' ;
+        $data = $request;
        // return $data;
         //return dd($request);  
         $faker = \Faker\Factory::create();

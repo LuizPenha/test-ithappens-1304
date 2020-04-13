@@ -30,7 +30,7 @@
 
 
 .initial-box{
-    width: 40vw;
+    width: 50vw;
     background: #55AFCD;
     margin: 0 auto;
     border:1px solid #ccc;
@@ -56,7 +56,7 @@
 }
 
 .order-box{
-    width: 40vw;
+    width: 50vw;
     background: whitesmoke;
     margin: 0 auto;
     border:1px solid #ccc;

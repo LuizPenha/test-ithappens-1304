@@ -15,10 +15,9 @@ Route::get('/', function () {
     return view('initial');
 });
 
-Route::resource('posts', 'PostsController');
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+
+Auth::routes();
 
 //resources controler
 Route::resource('branches', 'BranchController');
@@ -33,15 +32,6 @@ Route::resource('stocks', 'StockController');
 Route::resource('users', 'UserController');
 Route::resource('types', 'TypeController');
 
-//resources controler
-// Route::resource('Api/branches', 'BranchController');
-// Route::resource('Api/employees', 'EmployeeController');
-// Route::resource('Api/items', 'ItemController');
-// Route::resource('Api/orders', 'OrderController');
-// Route::resource('Api/payments', 'PaymentController');
-// Route::resource('Api/products', 'ProductController');
-// Route::resource('Api/stocks', 'StockController');
-// Route::resource('Api/users', 'UserController');
 
 Route::post('orders','OrderController@search')->name('orders.search');
 Route::post('orderss','OrderController@livesearch')->name('orders.livesearch');
@@ -57,3 +47,5 @@ Route::post('order/confirmation','ItemController@processItems')->name('process.i
 //     $data = App\Order::where('id',$order)->first();
 //     return view('ith.choice_products', ['order'=>$data]);    
 // })->name('choice.products');
+
+

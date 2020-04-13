@@ -15,6 +15,7 @@ class BranchController extends Controller
     public function index()
     // {  return '1';
     {
+        //return $request;
         $branches = Branch::all();
         //return dd($branches->stock());
         return response()->json($branches);

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,16 +14,50 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+// Route::get('/', function () {
+//     return redirect('/api');
+//   });
+  
+//   Route::group(array('prefix' => 'api'), function()
+//   {
+  
+//     Route::get('/api', function () {
+//         return response()->json(['message' => 'it Happens API', 'status' => 'Connected']);;
+//     });
+  
+//   Route::resource('/branches', 'BranchController');
+//   Route::resource('/employees', 'EmployeeController');
+//   Route::resource('/items', 'ItemController');
+//   Route::resource('/orders', 'OrderController');
+//   Route::resource('/payments', 'PaymentController');
+//   Route::resource('/products', 'ProductController');
+//   Route::resource('/stocks', 'StockController');
+//   Route::resource('/users', 'UserController');
+//   });
+
+Route::get('/', function () {
+    return response()->json(['message' => 'it Happens API', 'status' => 'Connected']);
 });
 
+
+// Route::group(array('prefix' => 'api'), function()
+// {
+
+//     Route::get('/', function () {
+//         return response()->json(['message' => 'it Happens API', 'status' => 'Connected']);;
+//     });
+// });
 
 //order routes
 Route::get('orders', function() {
     // If the Content-Type and Accept headers are set to 'application/json', 
     // this will return a JSON structure. This will be cleaned up later.
-    return App\Order::all();
+    //return App\Order::with('client')->all();
+    return App\Http\Controllers\OrderController::index(['api'=> true]);
 });
  
 Route::get('orders/{id}', function($id) {
@@ -31,7 +65,7 @@ Route::get('orders/{id}', function($id) {
 });
 
 Route::post('orders', function(Request $request) {
-    return App\Order::create($request->all);
+    return App\Http\Controllers\OrderController::create($request->all);
 });
 
 Route::put('orders/{id}', function(Request $request, $id) {

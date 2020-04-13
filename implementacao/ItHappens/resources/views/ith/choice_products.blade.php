@@ -41,7 +41,7 @@
 
     <div class="order-container ">
 	    <div class="order-box" align="center">
-            <h2>Inclua os Itens do Pedido</h2>
+            <h2 id="title_one">Inclua os Itens do Pedido</h2>
             {{ Form::open(array( 'name'=>'product_form','method'=>'post')) }}
             <div class="form-group">
                 <input type="text" class="form-control input-lg" placeholder="Digite o Sequencial , o barcode ou o nome do produto" id="product" name="product" data="" autocomplete="off" >
@@ -61,6 +61,7 @@
                 <table id="table" class="table table-responsive table-bordered">
                     <thead>
                         <tr>
+                            <th class="col-lg-1 text-center">Item.</th>
                             <th class="col-lg-1 text-center">Seq.</th>
                             <th class="col-lg-3 text-center">Cod.Barras</th>
                             <th class="col-lg-7 text-center">Nome</th>
@@ -75,7 +76,20 @@
                     </tbody>
                 </table>
             </div>
-            <br><br>
+            <br>
+            <div class="payment hide" id="payment">
+                <div class="card-header default-color-dark white-text">
+                    <h2 style="margin: 0;padding: 0;">Opcao de Pagamento</h2>
+                </div>
+                <br>
+                <select id="payment_select" class="form-control">
+                    <option value="">Selecione a Forma de Pagamento</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="boleto">Boleto</option>
+                    <option value="cartao">Cartao</option>
+                </select>
+            </div>
+            <br>
             <div class="text-right">
                 <button id="submitBtn" name="submitBtn" type="button" class="submitBtn btn btn-nd btn-success"><i class="fa fa-send"></i> Enviar</button>
             </div>
@@ -108,6 +122,7 @@ $(document).ready(function(){
                 data:{name:name, branch:branch, _token:_token},
                 success:function(result){
                     //console.log(result);
+                    i= $('#table tr').length -1;
                     if(result){
                         output = "<ul class='dropdown-menu order-dropdown' style='display:block; position:relative;overflow-x:auto;overflow-y:auto'>";
                         result.forEach( function(product){
@@ -137,6 +152,7 @@ $(document).ready(function(){
     });
     
         $("#addBtn").click(function(){
+            i++
             data = results.responseJSON
             //console.log(data[0].id);
         var product_id = jQuery('#product').attr("data");
@@ -182,12 +198,13 @@ $(document).ready(function(){
             }, 2000);           
             return;
         }
-        var markup = "<tr id='"+product.id+"'><td>"+product.id+"</td><td>" + product.bars_code + "</td><td>" + product.description + "</td><td id='"+product.id+"td'>" + "Ativo"+ "</td><td>" + quantity + "</td><td>" + product.price + "</td><td>" + (product.price*quantity).toFixed(2) + "</td><td><button class='btn btn-danger btn-small delBtn' type='button'>Cancelar</button></td></tr>";
+        
+        var markup = "<tr id='"+product.id+"'><td>"+i+"</td><td>"+product.id+"</td><td>" + product.bars_code + "</td><td>" + product.description + "</td><td id='"+product.id+"td'>" + "Ativo"+ "</td><td>" + quantity + "</td><td>" + product.price + "</td><td>" + (product.price*quantity).toFixed(2) + "</td><td><button class='btn btn-danger btn-small delBtn' type='button'>Cancelar</button></td></tr>";
             $("table tbody").append(markup);
             $('#product').attr('data', '');
             $('#product').val('');
             $('#quantity').val('');
-
+            i++
         });
 
         $('table').on('click',".delBtn", function(){
@@ -228,10 +245,10 @@ $(function (){
 <script>
     $(document).ready(function(){
         $('#submitBtn').click(function(){
-            var branch = {!! $order->branch->id !!};
-            var client = '{!! $order->client->name !!}';
-            var order = {!! $order->id !!};
-            var _token = $('input[name="_token"]').val();
+            var branch = {!! $order->branch->id !!}
+            var client = '{!! $order->client->name !!}'
+            var order = {!! $order->id !!}
+            var _token = $('input[name="_token"]').val()
             // var header = Array();
             //     $("table tr th").each(function(i, v){
             //             header[i] = $(this).text();
@@ -246,23 +263,91 @@ $(function (){
                         items[i][ii] = $(this).text();
                     }); 
                 })
-                alert(items);
+                //console.log([items[1],branch,client,order]);
                 $.ajax({
                     url:"{{ route('process.items') }}",
                     //url:"{{ route('product.search',[$order]) }}",
                     //async:true,
                     method:"POST",
-                    data:{items:items, branch:branch, _token:_token},
-                    success:function(result){
-                        //console.log(result);
+                    data:{items:items, branch:branch, order:order, _token:_token},
+                    success:function(results){
+                       // console.log(results.products[1]);
+                        //console.log(results.products[1].product);
 
+                        //console.log(results)
+                        $('#product').remove();
+                        $('#addBtn').remove();
+                        $('#quantity').remove();
+                        //$('#product_form').attr('action', 'resume.order');
+                        $(`#submitBtn`).addClass('hide');
+                        $('#submitBtn').html('Escolher Pgto');
+                        $('#submitBtn').removeClass('btn-success');
+                        $('#submitBtn').addClass('btn-danger');
+                        $('#submitBtn').attr('data-toggle', 'modal');
+                        $('#submitBtn').attr('data-target', 'modal-pay');
+
+                        //$("#table tr").remove();
+                        $("#table").find("tr:gt(0)").remove();
+                        $('#table').filter("td:eq(8)").remove();
+                        $('#title_one').text('Resumo do Pedido');
+
+
+                        response = results.response;
+                        var html = '<tr>';
+                        i=1;
+                        length_results = Object.keys(response).length
+                        for (let i = 1; i <= length_results ; i++) {
+                            console.log(response[i].product.id);
+                            html += '<td>'+i+'</td>';
+                            html += '<td>'+response[i].product.id+'</td>';
+                            html += '<td>'+response[i].product.bars_code+'</td>';
+                            html += '<td>'+response[i].product.description+'</td>';
+                            html += '<td>Processado</td>';
+                            html += '<td>'+response[i].qtd+'</td>';
+                            html += '<td>'+response[i].product.price+'</td>';
+                            html += '<td>'+((response[i].qtd*response[i].product.price).toFixed(2))+'</td>';
+                            html += '<td>'+response[i].product.id+'</td></tr>';
+                        }
+                        $('#table').prepend(html);
+                        $('#payment').removeClass('hide');
+                      /*  $('#submitBtn').click(function(){
+                            $('#modal-pay').show();
+                        });*/
                     }
                 });
+        });
+
+
+        $('#payment_select').on('change', function (e) {
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            if(optionSelected){
+                $('#submitBtn').val(optionSelected.val());
+                $('#submitBtn').removeClass('hide').show();
+                $('#submitBtn').val('value', optionSelected.val());
+                $('#submitBtn').val(optionSelected.val());
+               // alert($('#submitBtn').val());
+
+            }
         });
     });
 </script>
 
 
+{{-- <script>
+$(document).ready(function() {
+    $(window).keydown(function(event){
+        if(event.keyCode == 116) {
+
+            event.preventDefault();
+
+            return false;
+
+        }
+    });
+});
+
+</script> --}}
 
 @endsection
     </body>

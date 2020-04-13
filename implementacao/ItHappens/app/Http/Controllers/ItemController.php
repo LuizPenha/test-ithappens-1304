@@ -8,6 +8,8 @@ use App\Branch;
 use App\Employee;
 use App\Stock;
 use App\User;
+use App\Item;
+use App\Product;
 
 
 
@@ -96,19 +98,26 @@ class ItemController extends Controller
     public function processItems(Request $request)
     {
         $data = $request;
-        $order= Order::where('id', $data['order'])->first();
+        //$order= Order::where('id', $data['order'])->first();
         $branch= Branch::where('id', $data['branch'])->first();
         
         //$client= User::where('id', $order->client_id)->first();
         $items = $data['items'];
 
-        for($i=0; $i<(sizeof($items)-2); $i++){
-
+        $products = new \stdClass();
+        for($i=1; $i<=(sizeof($items)-2); $i++){
             $item = new Item();
-            $item->order_id = $items[$i]['order_id'];
-            $item->stock_id = Stock::where('branch_id', $branch->id)->where('product_id', $items[$i][0])->pluck('id');
-            $item->status = 3;
+            $item->stock_id = Stock::where('branch_id', $branch->id)->where('product_id', $items[$i][1])->pluck('id')->first();
+            $item->order_id = (int) $data['order'];
+            $item->qtd = (int) $items[$i][5];
+            $item->status_id = 3;
+            $item->save();
+            $item->setAttribute('product', Product::where('id', $items[$i][1])->first());
+            $item->setAttribute('branch', $data['order']);
+            $item->setAttribute('order', $data['branch']);
+            $products->$i = $item;
         }
-        return(dd($items));
+        return ['response'=>$products];
+        //return(dd($items));
     }
 }
